@@ -25,25 +25,44 @@ gallery.insertAdjacentHTML('beforeend', creatCard(galleryItems))
 
 gallery.addEventListener('click', handleCardClick)
 
+
+let currentLightboxInstance = null;
+
 function handleCardClick(evt) {
-    evt.preventDefault();
-window.addEventListener('keydown', onEscPress)
-    if (evt.target === evt.currentTarget) {
+  evt.preventDefault();
+
+  if (evt.target === evt.currentTarget) {
     return
-    }
+  }
     
    
-    const currentCard = evt.target.dataset.source;
-    console.log(currentCard)
-    const instance = basicLightbox.create(`<img src="${currentCard}" />`)
-instance.show()
+  const currentCard = evt.target.dataset.source;
+  console.log(currentCard)
+  if (currentLightboxInstance) {
+    currentLightboxInstance.close()
+  }
+  currentLightboxInstance = basicLightbox.create(`<img src="${currentCard}" />`,
+    {
+      onShow: () => (window.addEventListener('keydown', onEscPress)),
+      
+      onClose: () => {
+        window.removeEventListener('keydown', onEscPress);
+        currentLightboxInstance = null
+      
+      }
+    }
+  )
+  
+  currentLightboxInstance.show()
 
    
-    function onEscPress() {
-    instance.close()
+  function onEscPress(evt) {
+    if (evt.code === 'Escape') { currentLightboxInstance.close() }
+        
+    console.log(evt)
+  }
 }
- 
-}
+
 
 
 
